@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:football_shop/widgets/left_drawer.dart';
+import 'package:football_shop/productlist_form.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
@@ -8,9 +10,14 @@ class MyHomePage extends StatelessWidget {
   final String kelas = "E"; //kelas
 
   final List<ItemHomepage> items = [
-    ItemHomepage("All Products", Icons.shop, Colors.blue),
-    ItemHomepage("My Products", Icons.person, Colors.green),
-    ItemHomepage("Create Product", Icons.add, Colors.red),
+    ItemHomepage("All Products", Icons.shop, Colors.blueGrey),
+    ItemHomepage("My Products", Icons.person, Colors.teal),
+    ItemHomepage(
+      "Create Product",
+      Icons.add,
+      Colors.purple,
+      builder: (context) => const ProductFormPage(),
+    ),
   ];
 
   @override
@@ -23,6 +30,7 @@ class MyHomePage extends StatelessWidget {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
+      drawer: LeftDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         // Menyusun widget secara vertikal dalam sebuah kolom.
@@ -120,8 +128,9 @@ class ItemHomepage {
   final String name;
   final IconData icon;
   final Color color;
+  final WidgetBuilder? builder;
 
-  ItemHomepage(this.name, this.icon, this.color);
+  ItemHomepage(this.name, this.icon, this.color, {this.builder});
 }
 
 class ItemCard extends StatelessWidget {
@@ -142,14 +151,17 @@ class ItemCard extends StatelessWidget {
       child: InkWell(
         // Aksi ketika kartu ditekan.
         onTap: () {
-          // Menampilkan pesan SnackBar saat kartu ditekan.
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text("Kamu telah menekan tombol ${item.name}!"),
-              ),
-            );
+          if (item.builder != null) {
+            Navigator.push(context, MaterialPageRoute(builder: item.builder!));
+          } else { // Menampilkan pesan SnackBar saat kartu ditekan.
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text("Kamu telah menekan tombol ${item.name}!"),
+                ),
+              );
+          }
         },
         // Container untuk menyimpan Icon dan Text
         child: Container(
